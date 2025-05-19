@@ -16,9 +16,7 @@ Este repositório contém um **script para Tampermonkey** que facilita a **cópi
 
 ## ⚙️ O que o script faz?
 
-Detecta mensagem cliente 
-Detecta mensagem agente
-Copia as mensagens para o clipboard
+Detecta mensagem cliente , detecta mensagem agente e copia as mensagens para o clipboard
 
 ---
 
