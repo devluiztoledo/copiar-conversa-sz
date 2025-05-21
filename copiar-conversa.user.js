@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         A5 Copiar Conversa SZ.CHAT - Luiz Toledo
 // @namespace    http://tampermonkey.net/
-// @version      1.3
+// @version      1.4
 // @description  Adiciona botão para copiar toda a conversa em texto no SZ.CHAT webagent UI.
 // @author       Luiz Toledo
 // @match        https://ggnet.sz.chat/user/agent*
@@ -18,12 +18,10 @@
 
   const style = document.createElement('style');
   style.innerHTML = `
-    /* Remove o ::before (etiqueta) apenas do nosso botão */
     #btn-copiar-conversa::before {
       display: none !important;
       content: none !important;
     }
-    /* Ajusta o padding para ficar igual aos outros itens */
     #btn-copiar-conversa {
       padding-left: 1.33333333em !important;
     }
@@ -32,8 +30,8 @@
 
   const observer = new MutationObserver(() => {
     const menu = document.querySelector('.tags-sessions .menu.tags');
-    if (!menu || document.getElementById('btn-copiar-conversa')) return;
-
+    const btnGerar = document.getElementById('btn-gerar-atendimento');
+    if (!menu || !btnGerar || document.getElementById('btn-copiar-conversa')) return;
 
     const btn = document.createElement('a');
     btn.id = 'btn-copiar-conversa';
@@ -42,19 +40,41 @@
     btn.textContent = 'Copiar conversa';
 
     btn.addEventListener('click', () => {
-      const msgs = Array.from(document.querySelectorAll('.msg'));
+
+      const allMsgs = Array.from(document.querySelectorAll('.msg'));
+      const msgs = allMsgs.filter(msg => {
+        const nameEl = msg.querySelector('.message-details .name');
+        return !(nameEl && nameEl.textContent.trim() === 'Responder');
+      });
+
       const lines = msgs.map(msg => {
-        const time = msg.querySelector('.timestamp')?.textContent.trim() || '';
-        const name = msg.querySelector('.message-details .name')?.textContent.trim() || '';
-        const text = msg.querySelector('.message span')?.textContent.trim() || '';
+        const timeEl = msg.querySelector('.timestamp');
+        const time = timeEl ? timeEl.textContent.trim() : '';
+
+        const nameEl = msg.querySelector('.message-details .name');
+        const name = nameEl ? nameEl.textContent.trim() : '';
+
+
+        let text = '';
+        const span = msg.querySelector('.message span');
+        if (span) {
+          text = span.textContent.trim();
+        } else {
+          let contentEl = msg.querySelector('.message');
+          if (!contentEl) contentEl = msg.querySelector('.txt');
+          text = contentEl ? contentEl.textContent.trim() : '';
+        }
+        text = text.replace(/\bResponder\s*$/i, '').trim();
+
         return `${time} ${name}: ${text}`;
       });
-      const output = lines.join('\n');
-      GM_setClipboard(output);
+
+      GM_setClipboard(lines.join('\n'));
       alert('✅ Conversa copiada para o clipboard!');
     });
 
-    menu.appendChild(btn);
+
+    btnGerar.parentElement.insertBefore(btn, btnGerar.nextSibling);
   });
 
   observer.observe(document.body, { childList: true, subtree: true });
