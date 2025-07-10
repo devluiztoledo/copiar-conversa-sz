@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         A5 Copiar Conversa SZ.CHAT - Luiz Toledo
 // @namespace    http://tampermonkey.net/
-// @version      1.4
+// @version      1.5
 // @description  Adiciona botão para copiar toda a conversa em texto no SZ.CHAT webagent UI.
 // @author       Luiz Toledo
 // @match        https://ggnet.sz.chat/user/agent*
+// @match        *://clusterscpr.sz.chat/*
 // @grant        GM_setClipboard
 // @run-at       document-idle
 // @icon         https://raw.githubusercontent.com/devluiztoledo/copiar-conversa-sz/main/icon.png
